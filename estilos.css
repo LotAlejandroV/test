@@ -1,0 +1,40 @@
+/* Ocultar las flechas por defecto */
+.reveal .controls button {
+  opacity: 0 !important;
+  transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+/* Efecto y flecha para el borde IZQUIERDO (Sombra más ligera) */
+.reveal.hover-left .controls .navigate-left {
+  opacity: 1 !important;
+  transform: translateX(-5px);
+}
+
+.reveal.hover-left {
+  box-shadow: inset 30px 0 25px -15px rgba(255, 0, 0, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Efecto y flecha para el borde DERECHO (Sombra más ligera) */
+.reveal.hover-right .controls .navigate-right {
+  opacity: 1 !important;
+  transform: translateX(5px);
+}
+
+.reveal.hover-right {
+  box-shadow: inset -30px 0 25px -15px rgba(255, 0, 0, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Color rojo brillante y brillo para las flechas */
+.reveal .controls .navigate-left,
+.reveal .controls .navigate-right {
+  color: #ff3333 !important;
+  filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
+}
+
+/* === CORRECCIÓN DEL TAMAÑO DEL TÍTULO === */
+.reveal h1 {
+  font-size: 2.2em !important; /* Reduce un poco el tamaño para que quepa en una sola línea */
+  line-height: 1.2 !important;
+}
