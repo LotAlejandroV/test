@@ -1,7 +1,7 @@
 on:
-_workflow_dispatch:  # Permite ejecutarlo manualmente desde GitHub
+  workflow_dispatch:
   push:
-    branches: main   # Se activa automáticamente cada vez que hagas un "git push"
+    branches: [main]
 
 name: Quarto Publish
 

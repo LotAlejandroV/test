@@ -1,53 +1,282 @@
+
 ---
 title: "Mi primera presentación"
 format:
   revealjs:
     theme: blood
     transition: slide
+    slide-number: true
     controls: true
     controls-layout: edges
     css: estilos.css
 ---
 
-hola
+## Mi primera presentación
+
+Veamos el poder de Quarto combinando interactividad y diseño web.
 
 ---
 
-como
+## Simulación de búsqueda en laberinto 15 × 15
 
----
+<div class="panel-busqueda">
+  <span id="estado-texto">Presiona «Iniciar búsqueda»</span>
+  <button id="boton-busqueda" onclick="ejecutarUCS()">Iniciar búsqueda</button>
+</div>
 
-estan
+<div class="contenedor-laberinto">
+  <div id="grid-laberinto"></div>
+</div>
 
----
-
-espero que bien
-
----
-
-fin
+<div class="leyenda">
+  <span><i class="color-inicio"></i> Inicio</span>
+  <span><i class="color-meta"></i> Meta</span>
+  <span><i class="color-frontera"></i> Descubierto</span>
+  <span><i class="color-expandido"></i> Expandido</span>
+  <span><i class="color-camino"></i> Camino solución</span>
+  <span><i class="color-muro"></i> Muro</span>
+</div>
 
 <script>
-document.addEventListener("mousemove", (e) => {
-  const reveal = document.querySelector(".reveal");
-  if (!reveal) return;
-  
-  const width = window.innerWidth;
-  const x = e.clientX;
-  
-  // Si el cursor está en los 100px del borde izquierdo
-  if (x < 100) {
-    reveal.classList.add("hover-left");
-    reveal.classList.remove("hover-right");
-  } 
-  // Si el cursor está en los 100px del borde derecho
-  else if (x > width - 100) {
-    reveal.classList.add("hover-right");
-    reveal.classList.remove("hover-left");
-  } 
-  // Si está en el centro, se oculta todo
-  else {
-    reveal.classList.remove("hover-left", "hover-right");
+(() => {
+  // ========================================
+  // 1. NAVEGACIÓN Y EFECTO DE LOS BORDES
+  // ========================================
+
+  function configurarFlechas() {
+    const reveal = document.querySelector(".reveal");
+    if (!reveal || reveal.dataset.flechasConfiguradas === "true") return;
+
+    reveal.dataset.flechasConfiguradas = "true";
+
+    document.addEventListener("mousemove", (e) => {
+      const x = e.clientX;
+      const ancho = window.innerWidth;
+      const margen = 100;
+
+      reveal.classList.toggle("hover-left", x < margen);
+      reveal.classList.toggle("hover-right", x > ancho - margen);
+    });
+
+    document.addEventListener("mouseleave", () => {
+      reveal.classList.remove("hover-left", "hover-right");
+    });
   }
-});
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", configurarFlechas);
+  } else {
+    configurarFlechas();
+  }
+
+  // ========================================
+  // 2. LABERINTO
+  // ========================================
+
+  const filas = 15;
+  const cols = 15;
+
+  const mapaFijo = [
+    [0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+    [1,1,0,1,0,1,1,1,0,1,0,1,1,1,0],
+    [0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
+    [0,1,1,1,0,1,0,1,1,1,0,1,0,1,1],
+    [0,0,0,1,0,0,0,1,0,0,0,0,0,0,0],
+    [1,1,0,1,1,1,0,1,0,1,1,1,1,1,0],
+    [0,0,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    [0,1,1,1,0,1,1,1,0,1,0,1,0,1,0],
+    [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+    [1,1,0,1,1,1,0,1,1,1,0,1,1,1,0],
+    [0,0,0,0,0,1,0,0,0,1,0,0,0,0,0],
+    [0,1,1,1,0,1,1,1,0,1,1,1,0,1,1],
+    [0,0,0,1,0,0,0,1,0,0,0,0,0,0,0],
+    [1,1,0,1,1,1,0,1,1,1,1,1,0,1,1],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  ];
+
+  const inicio = {r: 0, c: 0};
+  const meta = {r: 14, c: 14};
+
+  const contenedor = document.getElementById("grid-laberinto");
+  const textoEstado = document.getElementById("estado-texto");
+  const boton = document.getElementById("boton-busqueda");
+
+  if (!contenedor || !textoEstado || !boton) return;
+
+  let celdas = [];
+  let ejecutando = false;
+
+  function esInicio(r, c) {
+    return r === inicio.r && c === inicio.c;
+  }
+
+  function esMeta(r, c) {
+    return r === meta.r && c === meta.c;
+  }
+
+  function crearLaberinto() {
+    contenedor.innerHTML = "";
+    celdas = [];
+
+    for (let r = 0; r < filas; r++) {
+      celdas[r] = [];
+
+      for (let c = 0; c < cols; c++) {
+        const celda = document.createElement("div");
+        celda.className = "celda";
+
+        if (esInicio(r, c)) {
+          celda.classList.add("inicio");
+          celda.textContent = "I";
+        } else if (esMeta(r, c)) {
+          celda.classList.add("meta");
+          celda.textContent = "M";
+        } else if (mapaFijo[r][c] === 1) {
+          celda.classList.add("muro");
+        } else {
+          celda.classList.add("libre");
+        }
+
+        contenedor.appendChild(celda);
+        celdas[r][c] = celda;
+      }
+    }
+  }
+
+  function esTransitable(r, c) {
+    return r >= 0 && r < filas &&
+           c >= 0 && c < cols &&
+           mapaFijo[r][c] === 0;
+  }
+
+  function pintar(r, c, clase) {
+    if (esInicio(r, c) || esMeta(r, c)) return;
+
+    celdas[r][c].classList.remove(
+      "frontera", "expandido", "camino"
+    );
+
+    celdas[r][c].classList.add(clase);
+  }
+
+  function pausa(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // ========================================
+  // 3. BÚSQUEDA EN ANCHURA (BFS)
+  // ========================================
+
+  async function ejecutarUCS() {
+    if (ejecutando) return;
+
+    ejecutando = true;
+    boton.disabled = true;
+
+    crearLaberinto();
+
+    textoEstado.textContent = "Iniciando búsqueda...";
+
+    const cola = [{r: inicio.r, c: inicio.c}];
+
+    const visitados = Array.from(
+      {length: filas},
+      () => Array(cols).fill(false)
+    );
+
+    const padres = Array.from(
+      {length: filas},
+      () => Array(cols).fill(null)
+    );
+
+    visitados[inicio.r][inicio.c] = true;
+
+    let encontrado = false;
+    let expansiones = 0;
+
+    // Abajo, derecha, arriba, izquierda.
+    const direcciones = [
+      {dr: 1, dc: 0},
+      {dr: 0, dc: 1},
+      {dr: -1, dc: 0},
+      {dr: 0, dc: -1}
+    ];
+
+    while (cola.length > 0) {
+      // FIFO: extraer el primer nodo de la frontera.
+      const actual = cola.shift();
+      expansiones++;
+
+      if (!esInicio(actual.r, actual.c)) {
+        pintar(actual.r, actual.c, "expandido");
+      }
+
+      textoEstado.textContent =
+        `Expandiendo (${actual.r}, ${actual.c}) · ` +
+        `${expansiones} nodos expandidos`;
+
+      await pausa(35);
+
+      if (esMeta(actual.r, actual.c)) {
+        encontrado = true;
+        break;
+      }
+
+      for (const d of direcciones) {
+        const nr = actual.r + d.dr;
+        const nc = actual.c + d.dc;
+
+        if (!esTransitable(nr, nc)) continue;
+        if (visitados[nr][nc]) continue;
+
+        // Marcar al descubrir evita duplicados en la cola.
+        visitados[nr][nc] = true;
+
+        // Guardar el padre permite reconstruir la solución.
+        padres[nr][nc] = actual;
+
+        cola.push({r: nr, c: nc});
+
+        if (!esMeta(nr, nc)) {
+          pintar(nr, nc, "frontera");
+        }
+      }
+    }
+
+    if (encontrado) {
+      // Reconstruir el camino desde la meta hacia el inicio.
+      const camino = [];
+      let actual = {r: meta.r, c: meta.c};
+
+      while (!esInicio(actual.r, actual.c)) {
+        camino.push(actual);
+        actual = padres[actual.r][actual.c];
+      }
+
+      camino.reverse();
+
+      textoEstado.textContent =
+        `Camino encontrado · ${camino.length} movimientos · ` +
+        `${expansiones} nodos expandidos`;
+
+      // Animar el camino solución.
+      for (const nodo of camino) {
+        pintar(nodo.r, nodo.c, "camino");
+        await pausa(45);
+      }
+    } else {
+      textoEstado.textContent =
+        `No se encontró camino · ${expansiones} nodos expandidos`;
+    }
+
+    boton.disabled = false;
+    boton.textContent = "Reiniciar búsqueda";
+    ejecutando = false;
+  }
+
+  // Mantener disponible la función para el botón HTML.
+  window.ejecutarUCS = ejecutarUCS;
+
+  crearLaberinto();
+})();
 </script>
