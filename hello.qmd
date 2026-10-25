@@ -1,0 +1,53 @@
+---
+title: "Mi primera presentación"
+format:
+  revealjs:
+    theme: blood
+    transition: slide
+    controls: true
+    controls-layout: edges
+    css: estilos.css
+---
+
+hola
+
+---
+
+como
+
+---
+
+estan
+
+---
+
+espero que bien
+
+---
+
+fin
+
+<script>
+document.addEventListener("mousemove", (e) => {
+  const reveal = document.querySelector(".reveal");
+  if (!reveal) return;
+  
+  const width = window.innerWidth;
+  const x = e.clientX;
+  
+  // Si el cursor está en los 100px del borde izquierdo
+  if (x < 100) {
+    reveal.classList.add("hover-left");
+    reveal.classList.remove("hover-right");
+  } 
+  // Si el cursor está en los 100px del borde derecho
+  else if (x > width - 100) {
+    reveal.classList.add("hover-right");
+    reveal.classList.remove("hover-left");
+  } 
+  // Si está en el centro, se oculta todo
+  else {
+    reveal.classList.remove("hover-left", "hover-right");
+  }
+});
+</script>
