@@ -1,40 +1,235 @@
-/* Ocultar las flechas por defecto */
+
+/* ========================================
+   NAVEGACIÓN: FLECHAS Y BORDES
+   ======================================== */
+
 .reveal .controls button {
   opacity: 0 !important;
-  transition: opacity 0.3s ease, transform 0.3s ease !important;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease !important;
 }
 
-/* Efecto y flecha para el borde IZQUIERDO (Sombra más ligera) */
 .reveal.hover-left .controls .navigate-left {
   opacity: 1 !important;
   transform: translateX(-5px);
 }
 
-.reveal.hover-left {
-  box-shadow: inset 30px 0 25px -15px rgba(255, 0, 0, 0.3);
-  transition: box-shadow 0.3s ease;
-}
-
-/* Efecto y flecha para el borde DERECHO (Sombra más ligera) */
 .reveal.hover-right .controls .navigate-right {
   opacity: 1 !important;
   transform: translateX(5px);
 }
 
-.reveal.hover-right {
-  box-shadow: inset -30px 0 25px -15px rgba(255, 0, 0, 0.3);
-  transition: box-shadow 0.3s ease;
-}
-
-/* Color rojo brillante y brillo para las flechas */
 .reveal .controls .navigate-left,
 .reveal .controls .navigate-right {
   color: #ff3333 !important;
   filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
 }
 
-/* === CORRECCIÓN DEL TAMAÑO DEL TÍTULO === */
+.reveal.hover-left {
+  box-shadow: inset 30px 0 25px -15px
+    rgba(255, 0, 0, 0.3);
+}
+
+.reveal.hover-right {
+  box-shadow: inset -30px 0 25px -15px
+    rgba(255, 0, 0, 0.3);
+}
+
+.reveal {
+  transition: box-shadow 0.3s ease;
+}
+
+/* ========================================
+   TÍTULOS
+   ======================================== */
+
 .reveal h1 {
-  font-size: 2.2em !important; /* Reduce un poco el tamaño para que quepa en una sola línea */
+  font-size: 2.2em !important;
   line-height: 1.2 !important;
+}
+
+/* ========================================
+   PANEL DE BÚSQUEDA
+   ======================================== */
+
+.panel-busqueda {
+  max-width: 500px;
+  margin: 0 auto 14px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #eee;
+  font-size: 0.55em;
+}
+
+#estado-texto {
+  text-align: left;
+}
+
+#boton-busqueda {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+  background: #e53e3e;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#boton-busqueda:hover {
+  background: #c53030;
+}
+
+#boton-busqueda:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* ========================================
+   LABERINTO
+   ======================================== */
+
+.contenedor-laberinto {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+#grid-laberinto {
+  display: grid;
+  grid-template-columns: repeat(15, 25px);
+  gap: 2px;
+  padding: 4px;
+  background: #4a5568;
+  border-radius: 5px;
+  max-width: 100%;
+}
+
+.celda {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 2px;
+  font-family: sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  transition:
+    background-color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.celda.libre {
+  background: #2d3748;
+}
+
+.celda.muro {
+  background: #11151d;
+}
+
+.celda.inicio {
+  background: #3182ce;
+  color: white;
+}
+
+.celda.meta {
+  background: #e53e3e;
+  color: white;
+}
+
+.celda.frontera {
+  background: #b7791f;
+}
+
+.celda.expandido {
+  background: #744210;
+}
+
+.celda.camino {
+  background: #e53e3e;
+  color: white;
+  transform: scale(0.94);
+}
+
+/* ========================================
+   LEYENDA
+   ======================================== */
+
+.leyenda {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  max-width: 650px;
+  margin: 14px auto 0;
+  font-size: 0.42em;
+}
+
+.leyenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.leyenda i {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.color-inicio {
+  background: #3182ce;
+}
+
+.color-meta {
+  background: #e53e3e;
+}
+
+.color-frontera {
+  background: #b7791f;
+}
+
+.color-expandido {
+  background: #744210;
+}
+
+.color-camino {
+  background: #e53e3e;
+}
+
+.color-muro {
+  background: #11151d;
+}
+
+/* ========================================
+   PANTALLAS PEQUEÑAS
+   ======================================== */
+
+@media (max-width: 600px) {
+  #grid-laberinto {
+    grid-template-columns: repeat(15, min(4.8vw, 25px));
+    gap: 1px;
+    padding: 2px;
+  }
+
+  .celda {
+    width: min(4.8vw, 25px);
+    height: min(4.8vw, 25px);
+    font-size: 8px;
+  }
+
+  .panel-busqueda {
+    font-size: 0.45em;
+  }
+
+  .leyenda {
+    font-size: 0.36em;
+  }
 }
